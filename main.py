@@ -1,35 +1,19 @@
-from telegram import Update, InputFile
-from telegram.ext import Updater, MessageHandler, Filters, CallbackContext
+from telegram.ext import Updater, MessageHandler, Filters
 
-media_store = {}
+TOKEN = "7868526712:AAGh13i6flGhYTg2hGaNHRMQMizHIDXEyGE"
 
-def handle_messages(update: Update, context: CallbackContext):
-    message = update.message
+def start_bot():
+    updater = Updater(TOKEN, use_context=True)
+    dp = updater.dispatcher
 
-    if message.document or message.photo:
-        caption = message.caption if message.caption else "NoCaption"
-        file_id = ""
-        if message.document:
-            file_id = message.document.file_id
-        elif message.photo:
-            file_id = message.photo[-1].file_id
-        media_store[caption.lower()] = file_id
-        message.reply_text("Media saved with caption: " + caption)
+    def echo(update, context):
+        update.message.reply_text("Bot chal raha hai, bolo kya chahiye?")
 
-    elif message.text:
-        keyword = message.text.strip().lower()
-        if keyword in media_store:
-            context.bot.send_document(chat_id=message.chat_id, document=media_store[keyword])
-        else:
-            message.reply_text("Kuch nahi mila bhai is keyword se.")
+    dp.add_handler(MessageHandler(Filters.text & ~Filters.command, echo))
 
-def main():
-    TOKEN = "7868526712:AAGh13i6flGhYTg2hGaNHRMQMizHIDXEyGE"
-    updater = Updater(token=TOKEN, use_context=True)
-    dispatcher = updater.dispatcher
-    dispatcher.add_handler(MessageHandler(Filters.all, handle_messages))
+    print("Bot starting...")
     updater.start_polling()
     updater.idle()
 
-if __name__ == '__main__':
-    main()
+if __name__ == "__main__":
+    start_bot()
